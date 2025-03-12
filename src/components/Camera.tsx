@@ -111,7 +111,6 @@ const CameraComponent: React.FC<CameraComponentProps> = ({
           playsInline
           muted
           className="absolute inset-0 w-full h-full object-cover"
-          onCancel={onCancel}
           onLoadedMetadata={() => setIsCameraReady(true)}
         />
         
