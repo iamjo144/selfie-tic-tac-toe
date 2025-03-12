@@ -1,7 +1,7 @@
 
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, Info } from "lucide-react";
+import { Camera, Info, Gamepad2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useGame } from "@/context/GameContext";
 import { Link } from "react-router-dom";
@@ -56,19 +56,19 @@ const Index = () => {
             <div className="space-y-4">
               <Button 
                 onClick={handleStartGame}
-                className="w-full btn-hover bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white px-6 py-6 rounded-xl shadow-lg"
+                className="w-full h-16 btn-hover bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-6 rounded-xl shadow-lg border border-white/20 backdrop-blur-sm"
               >
-                <Camera className="mr-2 h-5 w-5" />
-                Play Game
+                <Gamepad2 className="mr-2 h-6 w-6" />
+                <span className="text-lg">Play Game</span>
               </Button>
               
               <Link to="/about">
                 <Button 
                   variant="outline"
-                  className="w-full border-violet-200 text-violet-700 hover:bg-violet-50"
+                  className="w-full h-14 border-2 border-violet-200 text-violet-700 hover:bg-violet-50 hover:border-violet-300 transition-all duration-300 rounded-xl backdrop-blur-sm"
                 >
-                  <Info className="mr-2 h-4 w-4" />
-                  About
+                  <Info className="mr-2 h-5 w-5" />
+                  <span className="text-base">About</span>
                 </Button>
               </Link>
             </div>
