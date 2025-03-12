@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useGame } from "@/context/GameContext";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw, Home } from "lucide-react";
+import { RefreshCw, Home } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
@@ -75,27 +75,90 @@ const GameResult: React.FC = () => {
         // Draw the current video frame
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        // Apply a semi-transparent overlay
-        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        // Apply a semi-transparent gradient overlay based on result
+        if (gameResult === "win") {
+          // Golden gradient for win
+          const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          gradient.addColorStop(0, "rgba(255, 215, 0, 0.4)");
+          gradient.addColorStop(1, "rgba(218, 165, 32, 0.4)");
+          ctx.fillStyle = gradient;
+        } else if (gameResult === "loss") {
+          // Blue-purple gradient for loss
+          const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          gradient.addColorStop(0, "rgba(102, 51, 153, 0.4)");
+          gradient.addColorStop(1, "rgba(65, 105, 225, 0.4)");
+          ctx.fillStyle = gradient;
+        } else {
+          // Orange gradient for draw
+          const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          gradient.addColorStop(0, "rgba(255, 165, 0, 0.4)");
+          gradient.addColorStop(1, "rgba(255, 140, 0, 0.4)");
+          ctx.fillStyle = gradient;
+        }
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Set the text properties
-        ctx.font = "bold 60px sans-serif";
+        // Create glow effect for text
+        ctx.shadowColor = gameResult === "win" 
+          ? "rgba(255, 215, 0, 0.8)" 
+          : gameResult === "loss" 
+          ? "rgba(102, 51, 153, 0.8)" 
+          : "rgba(255, 165, 0, 0.8)";
+        ctx.shadowBlur = 15;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        
+        // Set text properties with improved styling
+        const fontSize = Math.min(canvas.width, canvas.height) * 0.12;
+        ctx.font = `bold ${fontSize}px 'Segoe UI', Roboto, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         
-        // Apply text based on the game result
+        // Add text stroke for better readability
+        ctx.lineWidth = fontSize / 15;
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.7)";
+        
+        // Apply text based on the game result with stylized look
         if (gameResult === "win") {
-          // Yellow/gold color for win
-          ctx.fillStyle = "rgba(255, 215, 0, 0.9)";
+          // Gold text with gentle gradient for win
+          const gradient = ctx.createLinearGradient(
+            canvas.width / 2 - 150, 
+            canvas.height / 2, 
+            canvas.width / 2 + 150, 
+            canvas.height / 2
+          );
+          gradient.addColorStop(0, "#FEF9C3");  // Light gold
+          gradient.addColorStop(0.5, "#FEF08A"); // Brighter gold
+          gradient.addColorStop(1, "#FDE047");   // Rich gold
+          ctx.fillStyle = gradient;
+          ctx.strokeText("YOU WON!", canvas.width / 2, canvas.height / 2);
           ctx.fillText("YOU WON!", canvas.width / 2, canvas.height / 2);
         } else if (gameResult === "loss") {
-          // Red color for loss
-          ctx.fillStyle = "rgba(220, 20, 60, 0.9)";
+          // Purple-blue gradient for loss
+          const gradient = ctx.createLinearGradient(
+            canvas.width / 2 - 150, 
+            canvas.height / 2, 
+            canvas.width / 2 + 150, 
+            canvas.height / 2
+          );
+          gradient.addColorStop(0, "#D8B4FE");  // Light purple
+          gradient.addColorStop(0.5, "#C084FC"); // Medium purple
+          gradient.addColorStop(1, "#A855F7");   // Deep purple
+          ctx.fillStyle = gradient;
+          ctx.strokeText("YOU LOST!", canvas.width / 2, canvas.height / 2);
           ctx.fillText("YOU LOST!", canvas.width / 2, canvas.height / 2);
         } else {
-          // Orange/amber color for draw
-          ctx.fillStyle = "rgba(255, 165, 0, 0.9)";
+          // Orange gradient for draw
+          const gradient = ctx.createLinearGradient(
+            canvas.width / 2 - 150, 
+            canvas.height / 2, 
+            canvas.width / 2 + 150, 
+            canvas.height / 2
+          );
+          gradient.addColorStop(0, "#FDBA74");  // Light orange
+          gradient.addColorStop(0.5, "#FB923C"); // Medium orange
+          gradient.addColorStop(1, "#F97316");   // Deep orange
+          ctx.fillStyle = gradient;
+          ctx.strokeText("IT'S A DRAW!", canvas.width / 2, canvas.height / 2);
           ctx.fillText("IT'S A DRAW!", canvas.width / 2, canvas.height / 2);
         }
         
