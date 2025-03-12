@@ -1,9 +1,10 @@
 
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera } from "lucide-react";
+import { Camera, Info } from "lucide-react";
 import { motion } from "framer-motion";
 import { useGame } from "@/context/GameContext";
+import { Link } from "react-router-dom";
 import CameraComponent from "@/components/Camera";
 import TicTacToe from "@/components/TicTacToe";
 import GameResult from "@/components/GameResult";
@@ -38,7 +39,7 @@ const Index = () => {
   }, [gameResult, gameState, setGameState]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-blue-100 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-50 p-4">
       <div className="w-full max-w-md">
         {gameState === "initial" && (
           <motion.div 
@@ -47,16 +48,30 @@ const Index = () => {
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <h1 className="text-3xl font-bold mb-2 text-gray-800">Selfie Tic-Tac-Toe</h1>
-            <p className="text-gray-600 mb-8">Take a photo and play on your custom background!</p>
+            <h1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-indigo-600">
+              Selfie Tic-Tac-Toe
+            </h1>
+            <p className="text-gray-600 mb-10">Take a photo and play on your custom background!</p>
             
-            <Button 
-              onClick={handleStartGame}
-              className="btn-hover bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full shadow-md"
-            >
-              <Camera className="mr-2 h-5 w-5" />
-              Start Camera
-            </Button>
+            <div className="space-y-4">
+              <Button 
+                onClick={handleStartGame}
+                className="w-full btn-hover bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white px-6 py-6 rounded-xl shadow-lg"
+              >
+                <Camera className="mr-2 h-5 w-5" />
+                Play Game
+              </Button>
+              
+              <Link to="/about">
+                <Button 
+                  variant="outline"
+                  className="w-full border-violet-200 text-violet-700 hover:bg-violet-50"
+                >
+                  <Info className="mr-2 h-4 w-4" />
+                  About
+                </Button>
+              </Link>
+            </div>
           </motion.div>
         )}
 

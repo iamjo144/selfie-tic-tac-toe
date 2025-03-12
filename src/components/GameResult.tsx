@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { useGame } from "@/context/GameContext";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { Camera, RefreshCw, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "@/components/ui/use-toast";
 
@@ -27,6 +27,24 @@ const GameResult: React.FC = () => {
       });
     }
   }, [gameResult]);
+
+  const getEmoji = () => {
+    if (gameResult === "win") return "😄";
+    if (gameResult === "loss") return "😔";
+    return "😐";
+  };
+
+  const getQuote = () => {
+    if (gameResult === "win") return "You Won!";
+    if (gameResult === "loss") return "You Lost!";
+    return "It's a Draw!";
+  };
+  
+  const getGradient = () => {
+    if (gameResult === "win") return "from-green-400 to-emerald-600";
+    if (gameResult === "loss") return "from-red-400 to-pink-600";
+    return "from-amber-400 to-orange-600";
+  };
   
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto animate-scale-in">
@@ -51,19 +69,34 @@ const GameResult: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-center"
           >
-            <div className="text-4xl font-bold mb-4 text-white text-shadow">
-              {gameResult === "win" && "You Won!"}
-              {gameResult === "loss" && "You Lost!"}
-              {gameResult === "draw" && "It's a Draw!"}
+            <div className="text-7xl mb-4">{getEmoji()}</div>
+            <div className={`text-4xl font-bold mb-4 text-white bg-gradient-to-r ${getGradient()} bg-clip-text text-transparent drop-shadow-md`}>
+              {getQuote()}
             </div>
             
-            <Button
-              onClick={resetGame}
-              className="bg-white/20 backdrop-blur-md text-white border border-white/30 hover:bg-white/30 mt-6"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Play Again
-            </Button>
+            <div className="flex gap-3 mt-8">
+              <Button
+                onClick={resetGame}
+                className="bg-white/20 backdrop-blur-md text-white border border-white/30 hover:bg-white/30"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Play Again
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="bg-white/20 backdrop-blur-md text-white border border-white/30 hover:bg-white/30"
+                onClick={() => {
+                  toast({
+                    title: "Share feature",
+                    description: "Coming soon in a future update!",
+                  });
+                }}
+              >
+                <Share2 className="mr-2 h-4 w-4" />
+                Share
+              </Button>
+            </div>
           </motion.div>
         </div>
       </div>
