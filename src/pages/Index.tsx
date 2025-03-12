@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, Info, Gamepad2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -13,8 +13,7 @@ const Index = () => {
   const { 
     gameState, 
     setGameState, 
-    setBackgroundImage, 
-    setResultImage, 
+    setBackgroundImage,
     gameResult
   } = useGame();
 
@@ -26,17 +25,6 @@ const Index = () => {
     setBackgroundImage(imageData);
     setGameState("playing");
   };
-
-  const handleResultCapture = (imageData: string) => {
-    setResultImage(imageData);
-  };
-
-  useEffect(() => {
-    if (gameState === "result" && gameResult) {
-      // When game is over, we need to capture a selfie for the result screen
-      setGameState("capturing");
-    }
-  }, [gameResult, gameState, setGameState]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-50 p-4">
@@ -56,36 +44,29 @@ const Index = () => {
             <div className="space-y-4">
               <Button 
                 onClick={handleStartGame}
-                className="w-full h-16 btn-hover bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-6 rounded-xl shadow-lg border border-white/20 backdrop-blur-sm"
+                className="w-full h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-6 rounded-xl shadow-lg border border-white/20 backdrop-blur-sm transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
               >
                 <Gamepad2 className="mr-2 h-6 w-6" />
-                <span className="text-lg">Play Game</span>
+                <span className="text-lg font-medium">Play Game</span>
               </Button>
               
-              <Link to="/about">
+              <Link to="/about" className="block">
                 <Button 
                   variant="outline"
-                  className="w-full h-14 border-2 border-violet-200 text-violet-700 hover:bg-violet-50 hover:border-violet-300 transition-all duration-300 rounded-xl backdrop-blur-sm"
+                  className="w-full h-14 border-2 border-violet-200 text-violet-700 hover:bg-violet-50 hover:border-violet-300 transition-all duration-300 rounded-xl backdrop-blur-sm transform hover:scale-105"
                 >
                   <Info className="mr-2 h-5 w-5" />
-                  <span className="text-base">About</span>
+                  <span className="text-base font-medium">About</span>
                 </Button>
               </Link>
             </div>
           </motion.div>
         )}
 
-        {gameState === "capturing" && !gameResult && (
+        {gameState === "capturing" && (
           <CameraComponent 
             onCapture={handleImageCapture}
             facingMode="environment"
-          />
-        )}
-
-        {gameState === "capturing" && gameResult && (
-          <CameraComponent 
-            onCapture={handleResultCapture}
-            facingMode="user"
           />
         )}
 
