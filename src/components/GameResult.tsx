@@ -170,10 +170,6 @@ const GameResult: React.FC = () => {
         setSavingImage(true);
         try {
           await saveResultImage(imageDataUrl, gameResult!);
-          toast({
-            title: "Image Saved",
-            description: "Your game result photo has been saved to the database.",
-          });
         } catch (error) {
           console.error("Error saving result image:", error);
           toast({
