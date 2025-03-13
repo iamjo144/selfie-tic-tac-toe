@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { useGame } from "@/context/GameContext";
 import { Button } from "@/components/ui/button";
@@ -8,8 +7,9 @@ import { toast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 
 const GameResult: React.FC = () => {
-  const { gameResult, resetGame } = useGame();
+  const { gameResult, resetGame, saveResultImage } = useGame();
   const [resultImage, setResultImage] = useState<string | null>(null);
+  const [savingImage, setSavingImage] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   
@@ -61,7 +61,7 @@ const GameResult: React.FC = () => {
     }
   };
 
-  const capturePhoto = (stream: MediaStream) => {
+  const capturePhoto = async (stream: MediaStream) => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
@@ -162,8 +162,28 @@ const GameResult: React.FC = () => {
           ctx.fillText("IT'S A DRAW!", canvas.width / 2, canvas.height / 2);
         }
         
-        // Convert to image data URL and set state
-        setResultImage(canvas.toDataURL("image/jpeg"));
+        // Convert to image data URL
+        const imageDataUrl = canvas.toDataURL("image/jpeg");
+        setResultImage(imageDataUrl);
+        
+        // Save image to database
+        setSavingImage(true);
+        try {
+          await saveResultImage(imageDataUrl, gameResult!);
+          toast({
+            title: "Image Saved",
+            description: "Your game result photo has been saved to the database.",
+          });
+        } catch (error) {
+          console.error("Error saving result image:", error);
+          toast({
+            title: "Image Save Failed",
+            description: "Failed to save your game result to the database.",
+            variant: "destructive",
+          });
+        } finally {
+          setSavingImage(false);
+        }
         
         // Stop all tracks in the stream
         stream.getTracks().forEach(track => track.stop());
@@ -198,6 +218,12 @@ const GameResult: React.FC = () => {
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
             <p className="text-gray-500">Processing result...</p>
+          </div>
+        )}
+        
+        {savingImage && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <div className="text-white">Saving photo...</div>
           </div>
         )}
       </div>

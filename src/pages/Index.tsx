@@ -8,22 +8,51 @@ import { Link } from "react-router-dom";
 import CameraComponent from "@/components/Camera";
 import TicTacToe from "@/components/TicTacToe";
 import GameResult from "@/components/GameResult";
+import { toast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const { 
     gameState, 
     setGameState, 
     setBackgroundImage,
-    gameResult
+    gameResult,
+    saveBackgroundImage
   } = useGame();
 
   const handleStartGame = () => {
     setGameState("capturing");
   };
 
-  const handleImageCapture = (imageData: string) => {
-    setBackgroundImage(imageData);
-    setGameState("playing");
+  const handleImageCapture = async (imageData: string) => {
+    try {
+      // Save image to Supabase and get public URL
+      const publicUrl = await saveBackgroundImage(imageData);
+      
+      if (publicUrl) {
+        // Set the public URL as the background image
+        setBackgroundImage(publicUrl);
+        setGameState("playing");
+      } else {
+        // If there was an error, we can still use the image data directly
+        setBackgroundImage(imageData);
+        setGameState("playing");
+        toast({
+          title: "Warning",
+          description: "Image saved locally only. Database storage failed.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving background image:", error);
+      // Fallback to using the image data directly
+      setBackgroundImage(imageData);
+      setGameState("playing");
+      toast({
+        title: "Warning",
+        description: "Image saved locally only. Database storage failed.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

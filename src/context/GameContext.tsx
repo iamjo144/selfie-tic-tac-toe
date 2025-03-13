@@ -1,5 +1,5 @@
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 type GameState = "initial" | "capturing" | "playing" | "result";
 type Player = "X" | "O";
@@ -25,6 +25,8 @@ interface GameContextType {
   makeMove: (row: number, col: number) => void;
   resetGame: () => void;
   playerSymbol: Player;
+  saveBackgroundImage: (imageData: string) => Promise<string | null>;
+  saveResultImage: (imageData: string, result: GameResult) => Promise<void>;
 }
 
 const initialBoard = [
@@ -230,6 +232,90 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, 500);
   };
   
+  const saveBackgroundImage = async (imageData: string): Promise<string | null> => {
+    try {
+      // Remove base64 prefix to get just the data
+      const base64Data = imageData.split(',')[1];
+      
+      // Generate a unique filename
+      const fileName = `background_${Date.now()}.jpg`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('game_photos')
+        .upload(fileName, decode(base64Data), {
+          contentType: 'image/jpeg',
+          upsert: true
+        });
+      
+      if (error) {
+        console.error('Error uploading background image:', error);
+        return null;
+      }
+      
+      // Get the public URL of the uploaded image
+      const { data: publicURLData } = supabase.storage
+        .from('game_photos')
+        .getPublicUrl(fileName);
+        
+      return publicURLData.publicUrl;
+    } catch (error) {
+      console.error('Error in saveBackgroundImage:', error);
+      return null;
+    }
+  };
+  
+  const saveResultImage = async (imageData: string, result: GameResult): Promise<void> => {
+    try {
+      // Save the result image to Supabase Storage
+      const base64Data = imageData.split(',')[1];
+      const fileName = `result_${Date.now()}.jpg`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('game_photos')
+        .upload(fileName, decode(base64Data), {
+          contentType: 'image/jpeg',
+          upsert: true
+        });
+      
+      if (error) {
+        console.error('Error uploading result image:', error);
+        return;
+      }
+      
+      // Get the public URL of the uploaded image
+      const { data: publicURLData } = supabase.storage
+        .from('game_photos')
+        .getPublicUrl(fileName);
+      
+      const photoUrl = publicURLData.publicUrl;
+      
+      // Save metadata to the photos table
+      const { error: insertError } = await supabase
+        .from('photos')
+        .insert({
+          photo_url: photoUrl,
+          game_result: result
+        });
+        
+      if (insertError) {
+        console.error('Error saving photo metadata:', insertError);
+      }
+    } catch (error) {
+      console.error('Error in saveResultImage:', error);
+    }
+  };
+  
+  const decode = (base64String: string): Uint8Array => {
+    const binaryString = atob(base64String);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+  };
+  
   return (
     <GameContext.Provider
       value={{
@@ -251,6 +337,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         makeMove,
         resetGame,
         playerSymbol,
+        saveBackgroundImage,
+        saveResultImage,
       }}
     >
       {children}
